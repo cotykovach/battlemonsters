@@ -16,8 +16,8 @@ public class Monster {
 	private Attack primaryAttack;
 	private Attack secondaryAttack;
 
-	public Monster(String name, int maxHealth, int score, Attack primaryAttack, Attack secondaryAttack) throws IOException {
-		//this.monsterPicture = ImageIO.read(monsterPictureFile);
+	public Monster(File monsterPictureFile, String name, int maxHealth, int score, Attack primaryAttack, Attack secondaryAttack) throws IOException {
+		this.monsterPicture = ImageIO.read(monsterPictureFile);
 		this.name = name;
 		this.maxHealth = maxHealth;
 		this.currentHealth = maxHealth;
@@ -64,9 +64,5 @@ public class Monster {
 
 	public int getCurrentHealth() {
 		return currentHealth;
-	}
-
-	public String getName() {
-		return name;
 	}
 }

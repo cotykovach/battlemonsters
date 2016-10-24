@@ -1,30 +1,25 @@
 package edu.bsu.cs222.BattlinMonstersGUI;
 
 import java.awt.AWTError;
-import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import java.awt.event.ActionEvent;
-import java.awt.image.BufferedImage;
-
-import javax.swing.JTextPane;
-import javax.swing.JTextField;
-
-import java.awt.Font;
-
 import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import edu.bsu.cs222.BattlinMonsters.Attack;
 import edu.bsu.cs222.BattlinMonsters.Battle;
@@ -32,12 +27,11 @@ import edu.bsu.cs222.BattlinMonsters.Monster;
 
 public class BattleGUI extends JPanel {
 
-	/**
+	/**				
 	 * 
 	 */
 	private static final long serialVersionUID = 6529803515165361423L;
 
-	private JTextPane txtpnScore;
 	private JTextPane txtpnBattleLog;
 	private JTextField txtInstructionOfAttack;
 	private JLayeredPane layeredPane;
@@ -62,24 +56,29 @@ public class BattleGUI extends JPanel {
 		} else if (damagedMonster == this.currentEnemy) {
 			enemyHealthBarLabel.setIcon(healthBarImageIcon[healthBarNumber]);
 		}
+		
+		
 	}
 
 	public BattleGUI() throws AWTError, IOException, ClassNotFoundException {
 		setLayout(null);
+		File akronPic = new File("images\\MonsterNameLabel.png");
 		Attack attack1 = new Attack(4, 10);
 		Attack attack2 = new Attack(-1, 15);
-		Monster player = new Monster("Akron", 255, 0, attack1, attack2);
+		Monster player = new Monster(akronPic, "Akron", 255, 0, attack1, attack2);
 
 		int monsterRandomizer = (int) (Math.random() * (2) + 1);
 		System.out.println(monsterRandomizer);
 		if (monsterRandomizer == 1) {
-			Monster enemy = new Monster("Evil Akron", 100, 0, attack1, attack2);
+			File evilAkronPic = new File("images\\monsters\\BattlinMonster_01.png");
+			Monster enemy = new Monster(evilAkronPic, "Evil Akron", 100, 0, attack1, attack2);
 			Battle newBattle = new Battle(player, enemy);
 			this.currentPlayer = player;
 			this.currentEnemy = enemy;
 			this.currentBattle = newBattle;
 		} else {
-			Monster enemy = new Monster("Coty, the Destroyer", 135, 0, attack1,
+			File cotyTheDestroyerPic = new File("images\\monsters\\BattlinMonster_02.png");
+			Monster enemy = new Monster(cotyTheDestroyerPic, "Lost Skoul", 135, 0, attack1,
 					attack2);
 			Battle newBattle = new Battle(player, enemy);
 
@@ -98,7 +97,7 @@ public class BattleGUI extends JPanel {
 			f++;
 		}
 
-		playerMonsterName = (currentPlayer.getName());
+		playerMonsterName = (currentPlayer.monsterName());
 		playerMonsterNameLabel = new JLabel(playerMonsterName);
 		playerMonsterNameLabel.setFont(playerMonsterNameLabel.getFont()
 				.deriveFont(Font.BOLD, 22));
@@ -124,15 +123,14 @@ public class BattleGUI extends JPanel {
 		enemyHealthText = (currentEnemy.getCurrentHealth() + "/" + currentEnemy
 				.getMaxHealth());
 
-		BufferedImage enemyMonsterNameBufferedImage = ImageIO.read(new File(
-				"images\\MonsterNameLabel.png"));
+		BufferedImage enemyMonsterNameBufferedImage = currentPlayer.monsterPicture();
 		Image enemyMonsterNameImage = enemyMonsterNameBufferedImage
 				.getScaledInstance(250, 35, Image.SCALE_SMOOTH);
 		JLabel playerMonsterNameLabel = new JLabel(new ImageIcon(
 				enemyMonsterNameImage));
 		playerMonsterNameLabel.setBounds(25, 0, 250, 35);
 
-		enemyMonsterName = (currentEnemy.getName());
+		enemyMonsterName = (currentEnemy.monsterName());
 		enemyMonsterNameLabel = new JLabel(enemyMonsterName);
 		enemyMonsterNameLabel.setFont(enemyMonsterNameLabel.getFont()
 				.deriveFont(Font.BOLD, 22));
@@ -159,6 +157,8 @@ public class BattleGUI extends JPanel {
 		add(enemyHealthBarLabel);
 		enemyHealthBarLabel.add(enemyHealthTextLabel);
 
+		
+		
 		txtpnBattleLog = new JTextPane();
 		txtpnBattleLog.setFont(new Font("YouYuan", Font.PLAIN, 11));
 		txtpnBattleLog.setText("Battle Log");
@@ -166,10 +166,17 @@ public class BattleGUI extends JPanel {
 		txtpnBattleLog.setBounds(258, 87, 279, 203);
 		add(txtpnBattleLog);
 
+		
 		layeredPane = new JLayeredPane();
 		layeredPane.setBounds(57, 392, 660, 250);
 		add(layeredPane);
 
+		
+		
+		
+		
+		
+		
 		useAttackButton = new JButton("USE");
 
 		useAttackButton.setBounds(620, 392, 120, 90);
@@ -185,10 +192,8 @@ public class BattleGUI extends JPanel {
 					}
 					playerHealthText = (currentPlayer.getCurrentHealth() + "/" + currentPlayer
 							.getMaxHealth());
-					enemyHealthText = (currentEnemy.getCurrentHealth() + "/" + currentEnemy
-							.getMaxHealth());
 					playerHealthTextLabel.setText(playerHealthText);
-					enemyHealthTextLabel.setText(enemyHealthText);
+					
 					if (currentPlayer.getCurrentHealth()
 							/ currentPlayer.getMaxHealth() < 1) {
 						percentHealth = (double) currentPlayer
@@ -204,6 +209,10 @@ public class BattleGUI extends JPanel {
 								.round(percentHealth * 100) + 4) / 5 * 5);
 						setHealthBar(percentHealth, currentEnemy);
 					}
+					
+					enemyHealthText = (currentEnemy.getCurrentHealth() + "/" + currentEnemy
+							.getMaxHealth());
+					enemyHealthTextLabel.setText(enemyHealthText);
 					if (currentBattle.checkHealth() == false) {
 						playerScoreLabel.setText("" + currentPlayer.getScore());
 						useAttackButton.setEnabled(false);
@@ -212,6 +221,10 @@ public class BattleGUI extends JPanel {
 			}
 		});
 
+		
+		
+		
+		
 		add(useAttackButton);
 
 		attackInfo = "Deals damage from 5 to 10.";
@@ -280,19 +293,17 @@ public class BattleGUI extends JPanel {
 		add(attack_2Button);
 
 		BufferedImage playerMonsterImage = ImageIO.read(new File(
-				"images\\BattlinMonster_00.png"));
+				"images\\monsters\\BattlinMonster_00.png"));
 		Image scaledPlayerMonsterImage = playerMonsterImage.getScaledInstance(
 				184, 247, Image.SCALE_SMOOTH);
 		JLabel picLabel = new JLabel(new ImageIcon(scaledPlayerMonsterImage));
 		picLabel.setBounds(57, 74, 184, 247);
 		add(picLabel);
 
-		if ((currentEnemy.getName().equals("Evil Akron"))) {
-			enemyMonsterImage = ImageIO.read(new File(
-					"images\\BattlinMonster_01.png"));
-		} else if ((currentEnemy.getName().equals("Coty, the Destroyer"))) {
-			enemyMonsterImage = ImageIO.read(new File(
-					"images\\BattlinMonster_99.png"));
+		if ((currentEnemy.monsterName().equals("Evil Akron"))) {
+			enemyMonsterImage = currentEnemy.monsterPicture();
+		} else if ((currentEnemy.monsterName().equals("Lost Skoul"))) {
+			enemyMonsterImage = currentEnemy.monsterPicture();
 		}
 
 		Image scaledEnemyMonsterImage = enemyMonsterImage.getScaledInstance(
