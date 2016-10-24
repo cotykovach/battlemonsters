@@ -1,0 +1,42 @@
+static factory methods 
+
+public static point create (float x, float y)
+pros :
+1. names, more readable
+	color.parse("#ffee00");
+
+color color = new color(String);
+
+2. dont have to create new objects
+
+3. return subtype of return type
+
+
+[      point      ]
+ 
+   ^          ^
+[  2d  ]     [ 3d  ]
+
+
+point p = new point(2, 2);
+
+
+
+point p = point.create(2,2);
+
+create(d x , d y){
+return 2d.create(2, 2);
+}
+
+*More flexible than regular constructors, can change methods instead of breaking code
+
+4. Reduced verbosity of generic types
+pg. 9 Joshua Block's code
+
+Cons
+1 Cannot subclass w/o public or protected
+2 Indistinguishable from other methods
+3 
+
+builder
+puzzle.create().withTitle("foo").build();
