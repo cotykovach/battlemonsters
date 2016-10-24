@@ -2,55 +2,74 @@ package edu.bsu.cs222.BattlinMonsters;
 
 public class Battle {
 
-	private Monster user;
-	private Monster computer;
+	private Monster user, enemy;
+	private int userDamageDealt, enemyDamageDealt;
 	
-	public Battle(Monster user, Monster computer){
+	public Battle(Monster user, Monster enemy){
 		this.user = user;
-		this.computer = computer;
+		this.enemy = enemy;
 	}
 	
 	public void attackComputer(String chosenAttack){
-		int healthDamage = 0;
+		userDamageDealt = 0;
 		if (chosenAttack.equals("primary")){
-			healthDamage = user.usePrimaryAttack().attackOpponent();
+			userDamageDealt = user.primaryAttack().attackOpponent(user.getAttack(), user, enemy);
 		}else if (chosenAttack.equals("secondary")){
-			healthDamage = user.useSecondaryAttack().attackOpponent();
+			userDamageDealt = user.secondaryAttack().attackOpponent(user.getAttack(), user, enemy);
 		}
-		System.out.println(healthDamage);
-		computer.decreaseHealth(healthDamage);
+		System.out.println(userDamageDealt);
+		enemy.decreaseHealth(userDamageDealt);
 	}
 	
 	public void attackUser(String chosenAttack){
-		int healthDamage = 0;
+		enemyDamageDealt = 0;
 		if (chosenAttack.equals("primary")){
-			healthDamage = computer.usePrimaryAttack().attackOpponent();
+			enemyDamageDealt = enemy.primaryAttack().attackOpponent(enemy.getAttack(), enemy, user);
 		}else if (chosenAttack.equals("secondary")){
-			healthDamage = computer.useSecondaryAttack().attackOpponent();
+			enemyDamageDealt = enemy.secondaryAttack().attackOpponent(enemy.getAttack(), enemy, user);
 		}
-		user.decreaseHealth(healthDamage);
+		user.decreaseHealth(enemyDamageDealt);
 	}	
 	
 	public int computerHealth(){
-		return computer.getCurrentHealth();
+		return enemy.getCurrentHealth();
 	}
 	
 	public int userHealth(){
 		return user.getCurrentHealth();
 	}
 	
-	public boolean checkHealth(){
-		if (user.getCurrentHealth() > 0 && computer.getCurrentHealth() > 0)
+	public boolean checkEnemyIsAlive(){
+		if (enemy.getCurrentHealth() > 0)
 			return true; 
-		else if (user.getCurrentHealth() > 0 && computer.getCurrentHealth() == 0){
-			user.setScore();
-			return false;
-		}
 		else
 			return false;
 	}
 	
+	public boolean checkUserIsAlive(){
+		if (user.getCurrentHealth() > 0)
+			return true; 
+		else
+			return false;
+	}
+	
+	public int userDamageDealt(){
+		return this.userDamageDealt;
+	}
+	
+	public int enemyDamageDealt(){
+		return this.enemyDamageDealt;
+	}
+	
+	public void victory(){
+		user.setScore();
+	}
+	
 	public int userScore(){
 		return user.getScore();
+	}
+
+	public void defeat() {
+		
 	}
 }

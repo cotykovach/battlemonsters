@@ -1,9 +1,12 @@
 package edu.bsu.cs222.BattlinMonstersGUI;
 
+import java.awt.AWTError;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFrame;
 
 import org.slf4j.Logger;
@@ -11,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class Main {
 		public static JFrame gamejframe = new JFrame("Battlin' Monsters!");
-	public static void main(String[] args) throws IOException, ClassNotFoundException {
+	public static void main(String[] args) throws IOException, ClassNotFoundException, AWTError, UnsupportedAudioFileException, LineUnavailableException {
 
 		Logger logger = (Logger) LoggerFactory.getLogger(Main.class);
 		logger.info("Main panel");

@@ -1,7 +1,7 @@
 package edu.bsu.cs222.BattlinMonstersGUI;
 
+
 import java.awt.AWTError;
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -11,170 +11,158 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextPane;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.bsu.cs222.BattlinMonsters.Load;
+import edu.bsu.cs222.BattlinMonsters.Monster;
 
 public class HomeGUI extends JPanel {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -2412131820687681043L;
-	
-	private JLabel jBattlinMonster;
-	private JTextPane jMonsterInfo;
-	private String[] monsterSelection = { "Akron"};
-	private JComboBox monsterSelectionBox = new JComboBox(monsterSelection);
-	private JButton jNewGame, jLoadGame, jExitGame, jNext, jPrevious;
-	private BufferedImage myMonsterPicture;
-	
-	
-	private class HomeGUIActions implements ActionListener{
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-	}
-	
-	public  HomeGUI(final JFrame gamejframe) throws  AWTError, IOException, ClassNotFoundException {
-	
-		BufferedImage newGameButtonBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\newGameButton.png"));
-		Image newGameButtonImage = newGameButtonBufferedImage.getScaledInstance(
-				250, 62, Image.SCALE_SMOOTH);
-		
-		BufferedImage newGameButtonHighlightBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\newGameButtonHighlight.png"));
-		Image newGameButtonHighlightImage = newGameButtonHighlightBufferedImage.getScaledInstance(
-				250, 62, Image.SCALE_SMOOTH);
-		
-		jNewGame = new JButton(new ImageIcon(newGameButtonImage));
-		jNewGame.setRolloverIcon(new ImageIcon(newGameButtonHighlightImage));
-		jNewGame.setBounds(285, 249, 250, 57);
-		jNewGame.setFocusPainted(false);
-		jNewGame.setMargin(new Insets(0, 0, 0, 0));
-		jNewGame.setBorderPainted(false);
-		jNewGame.setContentAreaFilled(false);
-		jNewGame.addActionListener(new ActionListener() {
+	private JButton newGameButton, loadGameButton, exitGameButton,
+			tutorialButton;
+	private Clip clip;
+	public HomeGUI(final JFrame gamejframe) throws AWTError, IOException,
+			ClassNotFoundException, UnsupportedAudioFileException, LineUnavailableException  {
+		Logger logger = (Logger) LoggerFactory.getLogger(HomeGUI.class);
+		logger.info("Home panel");
+		newGameButton = new JButton();
+		newGameButton.setBounds(285, 149, 250, 57);
+		buttonBuilder(newGameButton, "newGameButton");
+		newGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				clip.stop();
 				gamejframe.getContentPane().removeAll();
-					try {
-						gamejframe.getContentPane().add(new SelectionGUI(gamejframe));
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-						gamejframe.repaint();
-						gamejframe.setVisible(true);
+				try {
+					gamejframe.getContentPane().add(
+							new MonsterSelectionGUI(gamejframe));
+				} catch (AWTError e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (UnsupportedAudioFileException e1) {
+					e1.printStackTrace();
+				} catch (LineUnavailableException e1) {
+					e1.printStackTrace();
+				}
+				gamejframe.repaint();
+				gamejframe.setVisible(true);
+			}
+		});
+		File soundFile = new File("sounds\\mainMenuMusic.wav");
+		AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+		clip = AudioSystem.getClip();
+		clip.open(audioIn);
+		clip.loop(clip.LOOP_CONTINUOUSLY);
+		loadGameButton = new JButton();
+		loadGameButton.setBounds(285, 229, 250, 57);
+		buttonBuilder(loadGameButton, "loadGameButton");
+		loadGameButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser chooser = new JFileChooser();
+				String userHomeFolder = System.getProperty("user.home");
+				chooser.setCurrentDirectory(new File(userHomeFolder
+						+ "\\Desktop"));
+				int retrival = chooser.showOpenDialog(null);
+				File fileToOpen = null;
+				if (retrival == JFileChooser.APPROVE_OPTION) {
+					fileToOpen = chooser.getSelectedFile();
+				}
+				Load load = new Load();
+				load.parseFile(fileToOpen);
+				Monster user = load.loadUserMonster();
+				Monster enemy = load.loadEnemyMonster();
+				gamejframe.getContentPane().removeAll();
+				try {
+					clip.stop();
+					gamejframe.getContentPane().add(
+							new BattleGUI(gamejframe, user, enemy));
+				} catch (ClassNotFoundException e1) {
+					e1.printStackTrace();
+				} catch (AWTError e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (UnsupportedAudioFileException e1) {
+					e1.printStackTrace();
+				} catch (LineUnavailableException e1) {
+					e1.printStackTrace();
+				}
+				gamejframe.repaint();
+				gamejframe.setVisible(true);
 			}
 		});
 
-		
-		
-		BufferedImage loadGameButtonBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\loadGameButton.png"));
-		Image loadGameButtonImage = loadGameButtonBufferedImage.getScaledInstance(
-				250, 62, Image.SCALE_SMOOTH);
-		
-		BufferedImage loadGameButtonHighlightBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\loadGameButtonHighlight.png"));
-		Image loadGameButtonHighlightImage = loadGameButtonHighlightBufferedImage.getScaledInstance(
-				250, 62, Image.SCALE_SMOOTH);
-		
-		jLoadGame =new JButton(new ImageIcon(loadGameButtonImage));
-		jLoadGame.setFocusPainted(false);
-		jLoadGame.setMargin(new Insets(0, 0, 0, 0));
-		jLoadGame.setBorderPainted(false);
-		jLoadGame.setContentAreaFilled(false);
-		jLoadGame.setRolloverIcon(new ImageIcon(loadGameButtonHighlightImage));
-		jLoadGame.setBounds(285, 319, 250, 57);
-		
+		tutorialButton = new JButton();
+		tutorialButton.setBounds(285, 309, 250, 57);
+		buttonBuilder(tutorialButton, "tutorialButton");
+		tutorialButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				clip.stop();
+				try {
+					gamejframe.getContentPane().removeAll();
+					gamejframe.getContentPane().add(
+							new TutorialGUI(gamejframe));
+				} catch (AWTError e1) {
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} catch (LineUnavailableException e1) {
+					e1.printStackTrace();
+				} catch (UnsupportedAudioFileException e1) {
+					e1.printStackTrace();
+				}
+				gamejframe.repaint();
+				gamejframe.setVisible(true);
+			}
+		});
 
-		
-		
-		
-		BufferedImage exitGameButtonBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\exitGameButton.png"));
-		Image exitGameButtonImage = exitGameButtonBufferedImage.getScaledInstance(
-				250, 62, Image.SCALE_SMOOTH);
-		
-		BufferedImage exitGameButtonHighlightBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\exitGameButtonHighlight.png"));
-		Image exitGameButtonHighlightImage = exitGameButtonHighlightBufferedImage.getScaledInstance(
-				250, 62, Image.SCALE_SMOOTH);
-		
-		jExitGame =new JButton(new ImageIcon(exitGameButtonImage));
-		jExitGame.setRolloverIcon(new ImageIcon(exitGameButtonHighlightImage));
-		jExitGame.setBounds(285, 389, 250, 57);
-		jExitGame.setFocusPainted(false);
-		jExitGame.setMargin(new Insets(0, 0, 0, 0));
-		jExitGame.setBorderPainted(false);
-		jExitGame.setContentAreaFilled(false);
-		jExitGame.addActionListener(new ActionListener() {
+		exitGameButton = new JButton();
+		exitGameButton.setBounds(285, 389, 250, 57);
+		buttonBuilder(exitGameButton, "exitGameButton");
+		exitGameButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.exit(0);
 			}
 		});
-		
-		
-		BufferedImage nextButtonBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\nextButton.png"));
-		Image nextButtonImage = nextButtonBufferedImage;
-		
-		BufferedImage nextButtonHighlightBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\nextButtonHighlight.png"));
-		Image nextButtonHighlightImage = nextButtonHighlightBufferedImage;
-		
-		jNext =new JButton(new ImageIcon(nextButtonImage));
-		jNext.setFocusPainted(false);
-		jNext.setMargin(new Insets(0, 0, 0, 0));
-		jNext.setBorderPainted(false);
-		jNext.setContentAreaFilled(false);
-		
-		jNext.setRolloverIcon(new ImageIcon(nextButtonHighlightImage));
-		jNext.setBounds(675, 389, 120, 92);
-		
-		
-		BufferedImage previousButtonBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\previousButton.png"));
-		Image previousButtonImage = previousButtonBufferedImage;
-		
-		BufferedImage previousButtonHighlightBufferedImage = ImageIO.read(new File(
-				"images\\buttons\\previousButtonHighlight.png"));
-		Image previousButtonHighlightImage = previousButtonHighlightBufferedImage;
-		
-		jPrevious =new JButton(new ImageIcon(previousButtonImage));
-		jPrevious.setFocusPainted(false);
-		jPrevious.setMargin(new Insets(0, 0, 0, 0));
-		jPrevious.setBorderPainted(false);
-		jPrevious.setContentAreaFilled(false);
-		jPrevious.setRolloverIcon(new ImageIcon(previousButtonHighlightImage));
-		jPrevious.setBounds(0, 389, 120, 92);
-		
+
 		setLayout(null);
-		//add(monsterSelectionBox);
-		add(jNewGame);
-		add(jLoadGame);
-		//add(jHelp);
-		add(jExitGame);
-		//add(jNext);
-		//add(jPrevious);
-		
-		BufferedImage backgroundBufferedImage = ImageIO.read(new File(
-				"images\\BattlinMonstersHomeBackground.jpg"));
-		Image backgroundImage = backgroundBufferedImage.getScaledInstance(
-				810, 500, Image.SCALE_SMOOTH);
-		JLabel backgroundImageIcon = new JLabel(new ImageIcon(backgroundImage));
-		backgroundImageIcon.setBounds(-10, 0, 810, 500);
-		add(backgroundImageIcon);
+		ImageIcon gifImage = new ImageIcon("images\\mainMenuTest.gif");
+        JLabel background = new JLabel(gifImage);
+		background.setBounds(-10, 0, 810, 500);
+		add(background);
 	}
+
+	public void buttonBuilder(JButton button, String buttonName)
+			throws IOException {
+		BufferedImage buttonBufferedImage = ImageIO.read(new File(
+				"images\\buttons\\" + buttonName + ".png"));
+		Image buttonImage = buttonBufferedImage.getScaledInstance(250, 62,
+				Image.SCALE_SMOOTH);
+		BufferedImage buttonHighlightBufferedImage = ImageIO.read(new File(
+				"images\\buttons\\" + buttonName + "Highlight.png"));
+		Image buttonHighlightImage = buttonHighlightBufferedImage
+				.getScaledInstance(250, 62, Image.SCALE_SMOOTH);
+		button.setIcon(new ImageIcon(buttonImage));
+		button.setRolloverIcon(new ImageIcon(buttonHighlightImage));
+		button.setFocusPainted(false);
+		button.setMargin(new Insets(0, 0, 0, 0));
+		button.setBorderPainted(false);
+		button.setContentAreaFilled(false);
+		add(button);
+	}
+
 };
-	
