@@ -1,2 +1,2 @@
 # battlemonsters
-pokemon-esque battle game, sophomore year, java app
+monster battle game, sophomore year, java app
